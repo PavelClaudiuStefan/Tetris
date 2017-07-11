@@ -2,8 +2,10 @@ package pavelclaudiustefan.tetris.game;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class Tetris extends JFrame {
+public class Tetris extends JFrame implements KeyListener{
 
     private JPanel panel = null;
     private GridPanel grid;
@@ -32,30 +34,33 @@ public class Tetris extends JFrame {
         setSize(500, 479);
         setMinimumSize(new Dimension(400, 479));
         setLocationRelativeTo(null);
+        addKeyListener(this);
         setVisible(true);
     }
 
     public void start() {
-        System.out.println("Game on!");
         logic = new GridLogic();
         redrawGridAndInfo();
 
         //Main game flow
-        while (!logic.isGameOver()) {
-            logic.spawnTetromino();
-            redrawGridAndInfo();
-        }
-        //TODO - Temporar
-        while (true) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        new Thread(() -> {
+            while (!logic.isGameOver()) {
+                logic.spawnTetromino();
+                redrawGridAndInfo();
+                while (!logic.isRoundOver()) {
+                    try {
+                        Thread.sleep(1000);
+                        logic.moveTetrominoDown();
+                        redrawGridAndInfo();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            logic.reset();
-            logic.spawnTetromino();
-            redrawGridAndInfo();
-        }
+            // TODO - Proper game over screen
+            System.out.println("Game over!");
+            removeKeyListener(this);
+        }).start();
     }
 
     private void redrawGridAndInfo() {
@@ -77,4 +82,45 @@ public class Tetris extends JFrame {
         repaint();
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        if (key == KeyEvent.VK_LEFT) {
+            logic.moveTetrominoLeft();
+            redrawGridAndInfo();
+        }
+
+        if (key == KeyEvent.VK_RIGHT) {
+            logic.moveTetrominoRight();
+            redrawGridAndInfo();
+        }
+
+        if (key == KeyEvent.VK_UP) {
+            logic.reset();
+            redrawGridAndInfo();
+        }
+
+        if (key == KeyEvent.VK_DOWN) {
+            logic.moveTetrominoDown();
+            redrawGridAndInfo();
+        }
+
+        if (key == KeyEvent.VK_SPACE) {
+            while (!logic.isRoundOver()) {
+                logic.moveTetrominoDown();
+            }
+            redrawGridAndInfo();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
 }

@@ -1,3 +1,14 @@
+/*
+ * 0 -> Empty
+ * 1 -> line
+ * 2 -> square
+ * 3 -> L
+ * 4 -> J
+ * 5 -> S
+ * 6 -> Z
+ * 7 -> T
+ */
+
 package pavelclaudiustefan.tetris.game;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -58,13 +69,6 @@ class Tetromino {
             position[i][0] = shape[i][0];
             position[i][1] = shape[i][1] + 4;
         }
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 2; j++) {
-                System.out.print(shape[i][j] + " ");
-            }
-            System.out.println();
-        }
-
     }
 
     int getType() {
@@ -77,6 +81,57 @@ class Tetromino {
 
     int getX(int i) {
         return position[i][1];
+    }
+
+    void moveLeft(){
+        for (int i = 0; i < 4; i++) {
+            position[i][1]--;
+        }
+    }
+
+    void moveRight(){
+        for (int i = 0; i < 4; i++) {
+            position[i][1]++;
+        }
+    }
+
+    void moveDown() {
+        for (int i = 0; i < 4; i++) {
+            position[i][0]++;
+        }
+        // TODO - Everytime it moves down, reset a timer (at the end of the timer the tetromino movesDown automatically)
+    }
+
+    /*
+ * 0 -> Empty
+ * 1 -> line
+ * 2 -> square
+ * 3 -> L
+ * 4 -> J
+ * 5 -> S
+ * 6 -> Z
+ * 7 -> T
+ */
+    @Override
+    public String toString() {
+        switch (type) {
+            case 1:
+                return "Line piece";
+            case 2:
+                return "Square piece";
+            case 3:
+                return "L piece";
+            case 4:
+                return "J piece";
+            case 5:
+                return "S piece";
+            case 6:
+                return "Z piece";
+            case 7:
+                return "T piece";
+            default:
+                return "Empty piece";
+        }
     }
 
 }

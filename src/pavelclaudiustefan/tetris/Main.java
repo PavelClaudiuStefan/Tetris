@@ -17,14 +17,6 @@ public class Main {
         */
         Tetris game = new Tetris(0);
         game.start();
-
-        /*//TODO - Temporar
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 10; j++) {
-                System.out.print("|"+i+","+j+"|");
-            }
-            System.out.println();
-        }*/
     }
 
 }

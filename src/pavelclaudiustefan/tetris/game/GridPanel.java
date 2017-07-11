@@ -1,14 +1,3 @@
-/**
- * 0 -> Empty
- * 1 -> line
- * 2 -> square
- * 3 -> L
- * 4 -> J
- * 5 -> S
- * 6 -> Z
- * 7 -> T
- */
-
 package pavelclaudiustefan.tetris.game;
 
 import javax.imageio.ImageIO;
@@ -48,42 +37,45 @@ class GridPanel extends JPanel{
             e.printStackTrace();
         }
 
-        //Top border
-        for (int i = 0;  i < 12; i++) {
-            int x = 20 * i;
-            int y = 0;
-            JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
-            borderLabel.setBounds(x, y, 20, 20);
-            add(borderLabel);
+        if (borderSprite != null) {
+            //Top border
+            for (int i = 0;  i < 12; i++) {
+                int x = 20 * i;
+                int y = 0;
+                JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
+                borderLabel.setBounds(x, y, 20, 20);
+                add(borderLabel);
+            }
+
+            //Bottom border
+            for (int i = 0;  i < 12; i++) {
+                int x = 20 * i;
+                int y = 420;
+                JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
+                borderLabel.setBounds(x, y, 20, 20);
+                add(borderLabel);
+            }
+
+            //Left border
+            for (int i = 1;  i <= 20; i++) {
+                int x = 0;
+                int y = i * 20;
+                JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
+                borderLabel.setBounds(x, y, 20, 20);
+                add(borderLabel);
+            }
+
+            //Right border
+            for (int i = 1;  i <= 20; i++) {
+                int x = 220;
+                int y = 20 * i;
+                JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
+                borderLabel.setBounds(x, y, 20, 20);
+                add(borderLabel);
+            }
         }
 
-        //Bottom border
-        for (int i = 0;  i < 12; i++) {
-            int x = 20 * i;
-            int y = 420;
-            JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
-            borderLabel.setBounds(x, y, 20, 20);
-            add(borderLabel);
-        }
-
-        //Left border
-        for (int i = 1;  i <= 20; i++) {
-            int x = 0;
-            int y = i * 20;
-            JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
-            borderLabel.setBounds(x, y, 20, 20);
-            add(borderLabel);
-        }
-
-        //Right border
-        for (int i = 1;  i <= 20; i++) {
-            int x = 220;
-            int y = 20 * i;
-            JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
-            borderLabel.setBounds(x, y, 20, 20);
-            add(borderLabel);
-        }
-
+        //Draws grid area (the tetromino area)
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 10; j++) {
                 int x = 20 + j * 20;
