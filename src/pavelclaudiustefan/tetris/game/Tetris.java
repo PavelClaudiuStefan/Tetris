@@ -56,6 +56,9 @@ public class Tetris extends JFrame implements KeyListener{
                         e.printStackTrace();
                     }
                 }
+                // TODO - If there are any completed lines remove them and add points
+                logic.removeCompletedLines();
+                redrawGridAndInfo();
             }
             // TODO - Proper game over screen
             System.out.println("Game over!");
@@ -98,11 +101,6 @@ public class Tetris extends JFrame implements KeyListener{
 
         if (key == KeyEvent.VK_RIGHT) {
             logic.moveTetrominoRight();
-            redrawGridAndInfo();
-        }
-
-        if (key == KeyEvent.VK_UP) {
-            logic.reset();
             redrawGridAndInfo();
         }
 

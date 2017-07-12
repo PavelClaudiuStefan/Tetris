@@ -18,7 +18,7 @@ class InfoPanel extends JPanel{
         add(nextPieceLabel);
 
         JLabel scoreLabel = new JLabel();
-        scoreLabel.setText("Score: 999");
+        scoreLabel.setText("Score: " + logic.getScore());
         scoreLabel.setHorizontalAlignment(JLabel.CENTER);
         add(scoreLabel);
 

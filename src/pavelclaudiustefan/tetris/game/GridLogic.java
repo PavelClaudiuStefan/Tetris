@@ -14,11 +14,13 @@ class GridLogic {
     private int[][] grid;
     private boolean gameOver;
     private boolean roundOver;
+    private int score;
     private Queue<Tetromino> tetrominos;
     private Tetromino tetromino;
 
     GridLogic() {
         gameOver = false;
+        score = 0;
         grid = new int[20][10];
         tetrominos = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
@@ -34,6 +36,34 @@ class GridLogic {
         return roundOver;
     }
 
+    void removeCompletedLines() {
+        int scoreMultiplier = 0;
+        for (int y = 0; y < 20; y++) {
+            boolean lineCompleted = true;
+            for (int x = 0; x < 10; x++) {
+                if (grid[y][x] == 0)
+                    lineCompleted = false;
+            }
+            if (lineCompleted) {
+                scoreMultiplier++;
+                for (int x = 0; x < 10; x++) {
+                    grid[y][x] =0;
+                }
+                score += 10 * scoreMultiplier;
+                fillEmptyLine(y);
+            }
+        }
+    }
+
+    // Fills the empty line created when a line is completed
+    private void fillEmptyLine(int level) {
+        for (int y = level; y > 0; y--) {
+            for (int x = 0; x < 10; x++) {
+                grid[y][x] = grid[y-1][x];
+            }
+        }
+    }
+
     void spawnTetromino() {
         roundOver = false;
         tetromino = tetrominos.remove();
@@ -47,7 +77,6 @@ class GridLogic {
         } else {
             gameOver = true;
         }
-
     }
 
     void moveTetrominoLeft() {
@@ -63,6 +92,7 @@ class GridLogic {
             tetromino.moveRight();
         }
     }
+
     void moveTetrominoDown() {
         if (canTetrominoMove(0)) {
             moveTetromino(0);
@@ -70,10 +100,10 @@ class GridLogic {
         }
     }
 
+    private void moveTetromino(int direction) {
     // direction = -1 -> moveTetrominoLeft
     // direction = 1 -> moveTetrominoRight
     // direction = 0 -> moveTetrominoDown
-    private void moveTetromino(int direction) {
         for (int i = 0; i < 4; i++) {
             int x = tetromino.getX(i);
             int y = tetromino.getY(i);
@@ -95,10 +125,10 @@ class GridLogic {
 
     }
 
+    private boolean canTetrominoMove(int direction) {
     // direction = -1 -> moveTetrominoLeft
     // direction = 1 -> moveTetrominoRight
     // direction = 0 -> down
-    private boolean canTetrominoMove(int direction) {
         if (direction < -1 && direction > 1) {
             System.out.println("Something is wrong in GridLogic.java with the variable direction (out of bounds)");
             return false;
@@ -178,12 +208,12 @@ class GridLogic {
         return grid[x][y];
     }
 
-    Queue getTetrominos() {
-        return tetrominos;
+    int getScore() {
+        return score;
     }
 
-    void reset() {
-        spawnTetromino();
+    Queue getTetrominos() {
+        return tetrominos;
     }
 
 }
