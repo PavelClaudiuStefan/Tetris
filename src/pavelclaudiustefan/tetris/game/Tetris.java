@@ -8,8 +8,6 @@ import java.awt.event.KeyListener;
 public class Tetris extends JFrame implements KeyListener{
 
     private JPanel panel = null;
-    private GridPanel grid;
-    private InfoPanel info;
     private GridLogic logic;
     private int dota;
 
@@ -56,13 +54,14 @@ public class Tetris extends JFrame implements KeyListener{
                         e.printStackTrace();
                     }
                 }
-                // TODO - If there are any completed lines remove them and add points
                 logic.removeCompletedLines();
                 redrawGridAndInfo();
             }
             // TODO - Proper game over screen
             System.out.println("Game over!");
             removeKeyListener(this);
+            logic.setTopScore();
+            redrawGridAndInfo();
         }).start();
     }
 
@@ -73,11 +72,11 @@ public class Tetris extends JFrame implements KeyListener{
         panel.setLayout(new GridLayout(1, 2));
         add(panel);
 
-        grid = new GridPanel(logic, dota);
+        GridPanel grid = new GridPanel(logic, dota);
         grid.setBackground(Color.CYAN);
         panel.add(grid);
 
-        info = new InfoPanel(logic);
+        InfoPanel info = new InfoPanel(logic);
         info.setBackground(Color.green);
         panel.add(info);
 
@@ -114,6 +113,11 @@ public class Tetris extends JFrame implements KeyListener{
                 logic.moveTetrominoDown();
             }
             redrawGridAndInfo();
+        }
+
+        if (key == KeyEvent.VK_UP) {
+            // TODO - Rotate tetromino
+            System.out.println("Up, up and away!");
         }
     }
 

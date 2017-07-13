@@ -1,7 +1,11 @@
 package pavelclaudiustefan.tetris.game;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Scanner;
 
 /**
  * This class contains the game logic
@@ -15,17 +19,49 @@ class GridLogic {
     private boolean gameOver;
     private boolean roundOver;
     private int score;
+    private int topScore;
     private Queue<Tetromino> tetrominos;
     private Tetromino tetromino;
 
     GridLogic() {
         gameOver = false;
         score = 0;
+        initializeTopScoreFromFile();
         grid = new int[20][10];
         tetrominos = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             tetrominos.add(new Tetromino());
         }
+    }
+
+    private void initializeTopScoreFromFile() {
+        // TODO - A special class for player rankings
+        try {
+            Scanner in = new Scanner(new File("src/pavelclaudiustefan/tetris/players_info.txt"));
+            topScore = in.nextInt();
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    void setTopScore() {
+        // TODO - A special class for player rankings
+        if (score > topScore) {
+            topScore = score;
+            try {
+                PrintWriter out = new PrintWriter(new File("src/pavelclaudiustefan/tetris/players_info.txt"));
+                out.print(topScore);
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    int getTopScore() {
+        return topScore;
     }
 
     boolean isGameOver() {
@@ -37,7 +73,7 @@ class GridLogic {
     }
 
     void removeCompletedLines() {
-        int scoreMultiplier = 0;
+        int roundScore = 0;
         for (int y = 0; y < 20; y++) {
             boolean lineCompleted = true;
             for (int x = 0; x < 10; x++) {
@@ -45,23 +81,23 @@ class GridLogic {
                     lineCompleted = false;
             }
             if (lineCompleted) {
-                scoreMultiplier++;
+                if (roundScore == 0)
+                    roundScore = 10;
+                else
+                    roundScore *= 2;
                 for (int x = 0; x < 10; x++) {
                     grid[y][x] =0;
                 }
-                score += 10 * scoreMultiplier;
                 fillEmptyLine(y);
             }
         }
+        score += roundScore;
     }
 
     // Fills the empty line created when a line is completed
     private void fillEmptyLine(int level) {
-        for (int y = level; y > 0; y--) {
-            for (int x = 0; x < 10; x++) {
-                grid[y][x] = grid[y-1][x];
-            }
-        }
+        for (int y = level; y > 0; y--)
+            System.arraycopy(grid[y - 1], 0, grid[y], 0, 10);
     }
 
     void spawnTetromino() {
