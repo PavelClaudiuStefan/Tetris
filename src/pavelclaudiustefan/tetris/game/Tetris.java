@@ -15,18 +15,6 @@ public class Tetris extends JFrame implements KeyListener{
         super("Tetris");
 
         this.dota = dota;
-        if (dota == 0) {
-            // set tetromino sprites folder -> default
-            System.out.println("Default");
-        } else if (dota == 1) {
-            // set tetromino sprites folder -> dota
-            System.out.println("Dota");
-        } else if (dota == 2) {
-            // set tetromino sprites folder -> dota_v2
-            System.out.println("Dota v2");
-        } else {
-            System.out.println("dota value out of bounds");
-        }
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(500, 479);
@@ -40,6 +28,7 @@ public class Tetris extends JFrame implements KeyListener{
         logic = new GridLogic();
         redrawGridAndInfo();
 
+        // TODO - Make game flow and gui refreshing using a timer (checking and refreshing 60 times a second or so)
         //Main game flow
         new Thread(() -> {
             while (!logic.isGameOver()) {
@@ -48,7 +37,7 @@ public class Tetris extends JFrame implements KeyListener{
                 while (!logic.isRoundOver()) {
                     try {
                         Thread.sleep(1000);
-                        logic.moveTetrominoDown();
+                        //logic.moveTetrominoDown();
                         redrawGridAndInfo();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -63,9 +52,42 @@ public class Tetris extends JFrame implements KeyListener{
             logic.setTopScore();
             redrawGridAndInfo();
         }).start();
+
+        new Thread(() -> {
+            while (!logic.isGameOver()) {
+                tempRefreshGUI();
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            tempRefreshGUI();
+        }).start();
+
     }
 
-    private void redrawGridAndInfo() {
+    synchronized private void redrawGridAndInfo() {
+        // TODO - Better way to refresh GUI
+        /*if (panel != null)
+            remove(panel);
+        panel = new JPanel();
+        panel.setLayout(new GridLayout(1, 2));
+        add(panel);
+
+        GridPanel grid = new GridPanel(logic, dota);
+        grid.setBackground(Color.CYAN);
+        panel.add(grid);
+
+        InfoPanel info = new InfoPanel(logic);
+        info.setBackground(Color.green);
+        panel.add(info);
+
+        revalidate();
+        repaint();*/
+    }
+
+    private void tempRefreshGUI() {
         if (panel != null)
             remove(panel);
         panel = new JPanel();
@@ -109,15 +131,13 @@ public class Tetris extends JFrame implements KeyListener{
         }
 
         if (key == KeyEvent.VK_SPACE) {
-            while (!logic.isRoundOver()) {
-                logic.moveTetrominoDown();
-            }
+            logic.moveTetrominoDownCompletely();
             redrawGridAndInfo();
         }
 
         if (key == KeyEvent.VK_UP) {
-            // TODO - Rotate tetromino
-            System.out.println("Up, up and away!");
+            logic.rotateTetrominoRight();
+            redrawGridAndInfo();
         }
     }
 

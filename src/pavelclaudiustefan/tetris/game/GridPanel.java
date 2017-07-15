@@ -13,12 +13,23 @@ class GridPanel extends JPanel{
         setLayout(null);
 
         String path;
-        if (dota == 1) {
-            path = "src/pavelclaudiustefan/tetris/sprites/dota/";
-        } else if (dota == 2) {
-            path = "src/pavelclaudiustefan/tetris/sprites/dota_v2/";
-        } else {
-            path = "src/pavelclaudiustefan/tetris/sprites/default/";
+
+        switch (dota) {
+            case 1:
+                path = "src/pavelclaudiustefan/tetris/sprites/dota/";
+                break;
+            case 2:
+                path = "src/pavelclaudiustefan/tetris/sprites/dota_v2/";
+                break;
+            case 3:
+                path = "src/pavelclaudiustefan/tetris/sprites/dota_v3/";
+                break;
+            case 9:
+                path = "src/pavelclaudiustefan/tetris/sprites/hitler/";
+                break;
+            default:
+                path = "src/pavelclaudiustefan/tetris/sprites/default/";
+                break;
         }
 
         BufferedImage borderSprite = null;

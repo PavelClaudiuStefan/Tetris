@@ -18,6 +18,8 @@ class GridLogic {
     private int[][] grid;
     private boolean gameOver;
     private boolean roundOver;
+    private boolean tetrominoControllable;
+    private int completedLines;
     private int score;
     private int topScore;
     private Queue<Tetromino> tetrominos;
@@ -26,6 +28,7 @@ class GridLogic {
     GridLogic() {
         gameOver = false;
         score = 0;
+        completedLines = 0;
         initializeTopScoreFromFile();
         grid = new int[20][10];
         tetrominos = new LinkedList<>();
@@ -73,7 +76,8 @@ class GridLogic {
     }
 
     void removeCompletedLines() {
-        int roundScore = 0;
+        int roundCompletedLines = 0;
+        int[] scoreForNLines = new int[]{0, 10, 40, 60, 100};
         for (int y = 0; y < 20; y++) {
             boolean lineCompleted = true;
             for (int x = 0; x < 10; x++) {
@@ -81,17 +85,15 @@ class GridLogic {
                     lineCompleted = false;
             }
             if (lineCompleted) {
-                if (roundScore == 0)
-                    roundScore = 10;
-                else
-                    roundScore *= 2;
+                roundCompletedLines++;
                 for (int x = 0; x < 10; x++) {
                     grid[y][x] =0;
                 }
                 fillEmptyLine(y);
             }
         }
-        score += roundScore;
+        completedLines += roundCompletedLines;
+        score += scoreForNLines[roundCompletedLines];
     }
 
     // Fills the empty line created when a line is completed
@@ -110,20 +112,21 @@ class GridLogic {
                 int x = tetromino.getX(i);
                 grid[y][x] = tetromino.getType();
             }
+            tetrominoControllable = true;
         } else {
             gameOver = true;
         }
     }
 
     void moveTetrominoLeft() {
-        if (canTetrominoMove(-1)) {
+        if (canTetrominoMove(-1) && tetrominoControllable) {
             moveTetromino(-1);
             tetromino.moveLeft();
         }
     }
 
     void moveTetrominoRight(){
-        if (canTetrominoMove(1)) {
+        if (canTetrominoMove(1) && tetrominoControllable) {
             moveTetromino(1);
             tetromino.moveRight();
         }
@@ -134,6 +137,15 @@ class GridLogic {
             moveTetromino(0);
             tetromino.moveDown();
         }
+    }
+
+    synchronized void moveTetrominoDownCompletely() {
+        while (canTetrominoMove(0)) {
+            moveTetromino(0);
+            tetromino.moveDown();
+        }
+        tetrominoControllable = false;
+        roundOver = true;
     }
 
     private void moveTetromino(int direction) {
@@ -176,6 +188,7 @@ class GridLogic {
             for (int i = 0; i < 4; i++) {
                 int y = tetromino.getY(i) + 1;
                 if (y > 19) {
+                    tetrominoControllable = false;
                     roundOver = true;
                     return false;
                 }
@@ -186,6 +199,7 @@ class GridLogic {
                 int x = tetromino.getX(i);
                 int y = tetromino.getY(i) + 1;
                 if (!canSquareAdvance(x, y, i)) {
+                    tetrominoControllable = false;
                     roundOver = true;
                     return false;
                 }
@@ -209,6 +223,24 @@ class GridLogic {
             }
         }
         return true;
+    }
+
+    void rotateTetrominoRight() {
+        if (tetromino.getType() != Tetromino.SQUARE) {
+            // Take the tetromino out of the grid for updating position
+            for (int i = 0; i < 4; i++) {
+                int x = tetromino.getX(i);
+                int y = tetromino.getY(i);
+                grid[y][x] = 0;
+            }
+            tetromino.rotateRight();
+            // Place it back in the grid after updating position
+            for (int i = 0; i < 4; i++) {
+                int x = tetromino.getX(i);
+                int y = tetromino.getY(i);
+                grid[y][x] = tetromino.getType();
+            }
+        }
     }
     
     private boolean canTetrominoSpawn() {
@@ -246,6 +278,10 @@ class GridLogic {
 
     int getScore() {
         return score;
+    }
+
+    int getNumberOfCompletedLines() {
+        return completedLines;
     }
 
     Queue getTetrominos() {
