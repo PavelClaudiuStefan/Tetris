@@ -1,5 +1,10 @@
 package pavelclaudiustefan.tetris.game;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 class Tetromino {
@@ -17,8 +22,8 @@ class Tetromino {
     //[0, 4] -> Starting point
     //Every tetromino square is relative to the starting point
     private int[][] shape;
-     int[][] position;
-     int[][] backupPosition;
+    private int[][] position;
+    private int[][] backupPosition;
     private int type = 0;
 
     Tetromino() {
@@ -31,7 +36,8 @@ class Tetromino {
                 break;
             case LINE:
                 // Line shape
-                shape = new int[][]{{-1, -1}, {-1, 0}, {-1, 1}, {-1, 2}};
+                //shape = new int[][]{{-1, -1}, {-1, 0}, {-1, 1}, {-1, 2}};
+                shape = new int[][]{{0, -1}, {0, 0}, {0, 1}, {0, 2}};
                 type = 1;
                 break;
             case SQUARE:
@@ -77,62 +83,6 @@ class Tetromino {
             position[i][1] = shape[i][1] + xOffset;
         }
     }
-
-    /*Tetromino(int typeNumber) {
-         switch (typeNumber) {
-             case EMPTY:
-                 // Empty shape
-                 shape = new int[][]{{0, 0}, {0, 0}, {0, 0}, {0, 0}};
-                 type = 0;
-                 break;
-             case LINE:
-                 // Line shape
-                 shape = new int[][]{{-1, -1}, {-1, 0}, {-1, 1}, {-1, 2}};
-                 type = 1;
-                 break;
-             case SQUARE:
-                 // Square shape
-                 shape = new int[][]{{-1, 0}, {-1, 1}, {0, 0}, {0, 1}};
-                 type = 2;
-                 break;
-             case L:
-                 // L shape
-                 shape = new int[][]{{0, 0}, {-1, 1}, {0, -1}, {0, 1}};
-                 type = 3;
-                 break;
-             case J:
-                 // J shape
-                 shape = new int[][]{{0, 0}, {-1, -1}, {0, -1}, {0, 1}};
-                 type = 4;
-                 break;
-             case S:
-                 // S shape
-                 shape = new int[][]{{0, 0}, {-1, 0}, {-1, 1}, {0, -1}};
-                 type = 5;
-                 break;
-             case Z:
-                 // Z shape
-                 shape = new int[][]{{0, 0}, {-1, -1}, {-1, 0}, {0, 1}};
-                 type = 6;
-                 break;
-             case T:
-                 // T shape
-                 shape = new int[][]{{0, 0}, {-1, 0}, {0, -1}, {0, 1}};
-                 type = 7;
-                 break;
-             default:
-                 System.out.println("Error in Tetromino.java, randomNum out of bounds!");
-                 break;
-         }
-         //Set initial position
-         position = new int[4][2];
-         int yOffset = 1;
-         int xOffset = 4;
-         for (int i = 0; i < 4; i++) {
-             position[i][0] = shape[i][0] + yOffset;
-             position[i][1] = shape[i][1] + xOffset;
-         }
-     }*/
 
     int getType() {
         return type;
@@ -221,12 +171,45 @@ class Tetromino {
         }
     }
 
-    // TODO - Delete this
-    private void displayPosition() {
-        for (int i = 0; i < MAX_NUMBER_OF_SQUARES; i++) {
-            System.out.print("(" + position[i][0] + ", " + position[i][1] + ")  ");
+    static ArrayList<BufferedImage> getSprites(int dota) {
+        String path = getSpritesPath(dota);
+
+        ArrayList <BufferedImage> tetrominoSprites = new ArrayList<>();
+        try {
+            tetrominoSprites.add(ImageIO.read(new File(path + "empty.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "line.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "square.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "L.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "J.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "S.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "Z.png")));
+            tetrominoSprites.add(ImageIO.read(new File(path + "T.png")));
+            tetrominoSprites.add(ImageIO.read(new File("src/pavelclaudiustefan/tetris/sprites/border.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        System.out.println();
+        return  tetrominoSprites;
+    }
+
+    private static String getSpritesPath(int dota) {
+        String path;
+        switch (dota) {
+            case 1:
+                path = "src/pavelclaudiustefan/tetris/sprites/dota/";
+                return path;
+            case 2:
+                path = "src/pavelclaudiustefan/tetris/sprites/dota_v2/";
+                return path;
+            case 3:
+                path = "src/pavelclaudiustefan/tetris/sprites/dota_v3/";
+                return path;
+            case 9:
+                path = "src/pavelclaudiustefan/tetris/sprites/hitler/";
+                return path;
+            default:
+                path = "src/pavelclaudiustefan/tetris/sprites/default/";
+                return path;
+        }
     }
 
     @Override

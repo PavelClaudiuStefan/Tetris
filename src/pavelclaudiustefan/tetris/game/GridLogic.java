@@ -3,8 +3,7 @@ package pavelclaudiustefan.tetris.game;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -15,26 +14,33 @@ import java.util.Scanner;
  */
 class GridLogic {
 
+    private int dota;
     private int[][] grid;
+    private int[][] previewGrid;
     private boolean gameOver;
     private boolean roundOver;
     private boolean tetrominoControllable;
     private int completedLines;
     private int score;
     private int topScore;
-    private Queue<Tetromino> tetrominos;
+    private ArrayList<Tetromino> tetrominos;
     private Tetromino tetromino;
 
-    GridLogic() {
+    GridLogic(int dota) {
+        this.dota = dota;
         gameOver = false;
         score = 0;
         completedLines = 0;
         initializeTopScoreFromFile();
         grid = new int[20][10];
-        tetrominos = new LinkedList<>();
+        tetrominos = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             tetrominos.add(new Tetromino());
         }
+    }
+
+    int getDota() {
+        return dota;
     }
 
     private void initializeTopScoreFromFile() {
@@ -104,14 +110,27 @@ class GridLogic {
 
     void spawnTetromino() {
         roundOver = false;
-        tetromino = tetrominos.remove();
+        tetromino = tetrominos.remove(0);
         tetrominos.add(new Tetromino());
+        setPreviewGrid();
         if (isTetrominoValid()) {
             placeTetrominoInGrid();
             tetrominoControllable = true;
         } else {
             roundOver = true;
             gameOver = true;
+        }
+    }
+
+    private void setPreviewGrid() {
+        previewGrid = new int[10][6];
+        for (int t = 2; t >= 0; t--) {
+            for (int i = 0; i < 4; i++) {
+                Tetromino tetr = tetrominos.get(t);
+                int x = tetr.getX(i) - 3;
+                int y = tetr.getY(i) + (t * 3);
+                previewGrid[y][x] = tetr.getType();
+            }
         }
     }
 
@@ -210,8 +229,7 @@ class GridLogic {
     }
 
     private boolean shouldTetrominoBePushed() {
-        //if (tetromino.backupPosition[2][1] < tetromino.getX(2) && tetromino.backupPosition[2][0] > tetromino.getY(2))
-        //    return false;
+        // TODO -  If the tetromino colides with squares under it and not with squares on either side -> don't push it
         return true;
     }
 
@@ -246,8 +264,12 @@ class GridLogic {
         return true;
     }
 
-    int getSquareType(int x, int y) {
-        return grid[x][y];
+    int getSquareType(int y, int x) {
+        return grid[y][x];
+    }
+
+    int getPreviewSquareType(int y, int x) {
+        return previewGrid[y][x];
     }
 
     int getScore() {
@@ -257,9 +279,4 @@ class GridLogic {
     int getNumberOfCompletedLines() {
         return completedLines;
     }
-
-    Queue getTetrominos() {
-        return tetrominos;
-    }
-
 }

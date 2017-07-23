@@ -9,13 +9,11 @@ public class Tetris extends JFrame implements KeyListener{
 
     private JPanel panel = null;
     private GridLogic logic;
-    private int dota;
 
     public Tetris(int dota) {
         super("Tetris");
 
-        this.dota = dota;
-        logic = new GridLogic();
+        logic = new GridLogic(dota);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(500, 479);
@@ -76,12 +74,12 @@ public class Tetris extends JFrame implements KeyListener{
         panel.setLayout(new GridLayout(1, 2));
         add(panel);
 
-        GridPanel grid = new GridPanel(logic, dota);
-        grid.setBackground(Color.CYAN);
+        GridPanel grid = new GridPanel(logic, 20, 10);
+        //grid.setBackground(Color.CYAN);
         panel.add(grid);
 
         InfoPanel info = new InfoPanel(logic);
-        info.setBackground(Color.green);
+        info.setBackground(Color.CYAN);
         panel.add(info);
 
         revalidate();

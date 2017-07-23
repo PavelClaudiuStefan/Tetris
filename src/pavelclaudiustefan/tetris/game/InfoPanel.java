@@ -5,31 +5,29 @@ import java.awt.*;
 
 class InfoPanel extends JPanel{
 
+    private GridLogic logic;
+
     InfoPanel(GridLogic logic) {
         setLayout(new GridLayout(0, 1));
+        this.logic = logic;
 
-        if (!logic.isGameOver()) {
-            JLabel nextPieceLabel = new JLabel();
-            StringBuilder pieces = new StringBuilder("<html>Next pieces:<br>");
-            for (Object tetromino : logic.getTetrominos()) {
-                pieces.append("<br>").append(tetromino);
-            }
-            nextPieceLabel.setText(pieces.toString());
-            nextPieceLabel.setHorizontalAlignment(JLabel.CENTER);
-            add(nextPieceLabel);
-        } else {
-            JLabel gameOverLabel = new JLabel("Game over!");
-            gameOverLabel.setHorizontalAlignment(JLabel.CENTER);
-            add(gameOverLabel);
-        }
+        drawNextTetrominoesPanel();
 
         JLabel scoreLabel = new JLabel();
         scoreLabel.setText("<html>Score: " + logic.getScore() +
                            "<br>Top score: " + logic.getTopScore() +
                            "<br>Completed lines: " + logic.getNumberOfCompletedLines() + "</html>");
         scoreLabel.setHorizontalAlignment(JLabel.CENTER);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 0;
         add(scoreLabel);
+    }
 
+    private void drawNextTetrominoesPanel() {
+        JPanel nextTetrominoesPanel = new GridPanel(logic, 8, 4);
+        nextTetrominoesPanel.setBackground(Color.cyan);
+        add(nextTetrominoesPanel);
     }
 
 }
