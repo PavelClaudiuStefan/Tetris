@@ -14,12 +14,13 @@ public class Main {
         /* TODO:
         * Replace main with a gui starting menu
         * Respective gui allows choosing between tetromino styles (Dota || Default)
+        * Make a config file.cfg
         */
 
         // dota: 0 -> Default style tetrominoes
         // dota: 1 -> Dota basic style tetrominoes
         // dota: 2 -> Dota improved style tetrominoes
-        Tetris game = new Tetris(9);
+        Tetris game = new Tetris(3);
         game.start();
     }
 

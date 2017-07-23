@@ -4,19 +4,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 class Tetromino {
 
+    final static int MAX_NUMBER_OF_SQUARES = 4;
     private final static int EMPTY = 0;
-    final static int LINE = 1;
+    private final static int LINE = 1;
     final static int SQUARE = 2;
-    final static int L = 3;
-    final static int J = 4;
-    final static int S = 5;
-    final static int Z = 6;
-    final static int T = 7;
+    private final static int L = 3;
+    private final static int J = 4;
+    private final static int S = 5;
+    private final static int Z = 6;
+    private final static int T = 7;
 
     //[0, 4] -> Starting point
     //Every tetromino square is relative to the starting point
     private int[][] shape;
-    private int[][] position;
+     int[][] position;
+     int[][] backupPosition;
     private int type = 0;
 
     Tetromino() {
@@ -76,7 +78,7 @@ class Tetromino {
         }
     }
 
-    Tetromino(int typeNumber) {
+    /*Tetromino(int typeNumber) {
          switch (typeNumber) {
              case EMPTY:
                  // Empty shape
@@ -130,7 +132,7 @@ class Tetromino {
              position[i][0] = shape[i][0] + yOffset;
              position[i][1] = shape[i][1] + xOffset;
          }
-     }
+     }*/
 
     int getType() {
         return type;
@@ -163,39 +165,32 @@ class Tetromino {
         // TODO - Everytime it moves down, reset a timer (at the end of the timer the tetromino movesDown automatically)
     }
 
+    void savePosition() {
+        backupPosition = new int[4][2];
+        for (int i = 0; i < MAX_NUMBER_OF_SQUARES; i++) {
+            backupPosition[i][0] = position[i][0];
+            backupPosition[i][1] = position[i][1];
+        }
+    }
+
+    void undoPositionChange() {
+        for (int i = 0; i < MAX_NUMBER_OF_SQUARES; i++) {
+            position[i][0] = backupPosition[i][0];
+            position[i][1] = backupPosition[i][1];
+        }
+    }
+
     void rotateRight() {
-        switch (type) {
-            case EMPTY:
-                break;
-            case LINE:
-                rotate();
-                break;
-            case SQUARE:
-                //Can't rotate
-                break;
-            case L:
-                rotate();
-                break;
-            case J:
-                rotate();
-                break;
-            case S:
-                rotate();
-                break;
-            case Z:
-                rotate();
-                break;
-            case T:
-                rotate();
-                break;
-            default:
-                System.out.println("ERROR IN Tetromino.java at toString()");
-                break;
+        if (type != SQUARE) {
+            rotate();
         }
     }
 
     private void rotate() {
+        savePosition();
+
         if (type == LINE) {
+            // TODO - Fix line rotation (First rotation is one unit to the left than what it should be)
             int yOffset = position[0][0] - shape[0][0];
             int xOffset = position[0][1] - shape[0][1];
             // lineUnit is -1, or 1 and it's used to know how to rotate the line
@@ -214,7 +209,6 @@ class Tetromino {
                 position[squareOrder][0] = shape[squareOrder][0] + yOffset;
                 position[squareOrder][1] = shape[squareOrder][1] + xOffset;
             }
-            System.out.println();
         } else {
             for (int squareOrder = 1; squareOrder < 4; squareOrder++) {
                 int temp = shape[squareOrder][0];
@@ -225,6 +219,14 @@ class Tetromino {
                 position[squareOrder][1] = position[0][1] + shape[squareOrder][1];
             }
         }
+    }
+
+    // TODO - Delete this
+    private void displayPosition() {
+        for (int i = 0; i < MAX_NUMBER_OF_SQUARES; i++) {
+            System.out.print("(" + position[i][0] + ", " + position[i][1] + ")  ");
+        }
+        System.out.println();
     }
 
     @Override

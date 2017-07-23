@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 /**
  * This class contains the game logic
- * The tetris grid is represented by a matrix:
+ * The tetris grid is represented by a 2 dimensinal array:
  *      > 0 -> Occupied square
  *      = 0 -> Free square
  */
@@ -96,8 +96,8 @@ class GridLogic {
         score += scoreForNLines[roundCompletedLines];
     }
 
-    // Fills the empty line created when a line is completed
     private void fillEmptyLine(int level) {
+        // Fills the empty line created when a line is completed
         for (int y = level; y > 0; y--)
             System.arraycopy(grid[y - 1], 0, grid[y], 0, 10);
     }
@@ -106,166 +106,140 @@ class GridLogic {
         roundOver = false;
         tetromino = tetrominos.remove();
         tetrominos.add(new Tetromino());
-        if (canTetrominoSpawn()) {
-            for (int i = 0; i < 4; i++) {
-                int y = tetromino.getY(i);
-                int x = tetromino.getX(i);
-                grid[y][x] = tetromino.getType();
-            }
+        if (isTetrominoValid()) {
+            placeTetrominoInGrid();
             tetrominoControllable = true;
         } else {
+            roundOver = true;
             gameOver = true;
         }
     }
 
     void moveTetrominoLeft() {
-        if (canTetrominoMove(-1) && tetrominoControllable) {
-            moveTetromino(-1);
+        if (tetrominoControllable) {
+            removeTetrominoFromGrid();
+            tetromino.savePosition();
             tetromino.moveLeft();
+            if (isTetrominoValid()) {
+                placeTetrominoInGrid();
+            } else {
+                tetromino.undoPositionChange();
+                placeTetrominoInGrid();
+            }
         }
     }
 
     void moveTetrominoRight(){
-        if (canTetrominoMove(1) && tetrominoControllable) {
-            moveTetromino(1);
+        if (tetrominoControllable) {
+            removeTetrominoFromGrid();
+            tetromino.savePosition();
             tetromino.moveRight();
+            if (isTetrominoValid()) {
+                placeTetrominoInGrid();
+            } else {
+                tetromino.undoPositionChange();
+                placeTetrominoInGrid();
+            }
         }
     }
 
     void moveTetrominoDown() {
-        if (canTetrominoMove(0)) {
-            moveTetromino(0);
+        if (tetrominoControllable) {
+            removeTetrominoFromGrid();
+            tetromino.savePosition();
             tetromino.moveDown();
+            if (isTetrominoValid()) {
+                placeTetrominoInGrid();
+            } else {
+                tetrominoControllable = false;
+                roundOver = true;
+                tetromino.undoPositionChange();
+                placeTetrominoInGrid();
+            }
         }
     }
 
     synchronized void moveTetrominoDownCompletely() {
-        while (canTetrominoMove(0)) {
-            moveTetromino(0);
-            tetromino.moveDown();
+        while (tetrominoControllable) {
+            moveTetrominoDown();
         }
-        tetrominoControllable = false;
-        roundOver = true;
     }
 
-    private void moveTetromino(int direction) {
-    // direction = -1 -> moveTetrominoLeft
-    // direction = 1 -> moveTetrominoRight
-    // direction = 0 -> moveTetrominoDown
+    void rotateTetrominoRight() {
+        if (tetromino.getType() != Tetromino.SQUARE) {
+            removeTetrominoFromGrid();
+            tetromino.savePosition();
+            tetromino.rotateRight();
+            // Dirty solution :
+            // If rotated tetromino is valid place it in the grid
+            // If rotated tetromino is not valid, move it right
+            // If not valid, move it right
+            // If not valid, move it left 3 times
+            // If not valid, undo position change
+            if (isTetrominoValid()) {
+                placeTetrominoInGrid();
+            } else {
+                if (shouldTetrominoBePushed()) {
+                    tetromino.moveRight();
+                    if (isTetrominoValid()) {
+                        placeTetrominoInGrid();
+                    } else {
+                        tetromino.moveRight();
+                        if (isTetrominoValid()) {
+                            placeTetrominoInGrid();
+                        } else {
+                            tetromino.moveLeft();
+                            tetromino.moveLeft();
+                            tetromino.moveLeft();
+                            if (isTetrominoValid()) {
+                                placeTetrominoInGrid();
+                            } else {
+                                tetrominoControllable = false;
+                                tetromino.undoPositionChange();
+                                placeTetrominoInGrid();
+                            }
+                        }
+                    }
+                } else {
+                    tetrominoControllable = false;
+                    tetromino.undoPositionChange();
+                    placeTetrominoInGrid();
+                }
+            }
+        }
+    }
+
+    private boolean shouldTetrominoBePushed() {
+        //if (tetromino.backupPosition[2][1] < tetromino.getX(2) && tetromino.backupPosition[2][0] > tetromino.getY(2))
+        //    return false;
+        return true;
+    }
+
+    private void removeTetrominoFromGrid() {
+        // Take the tetromino out of the grid for updating position
         for (int i = 0; i < 4; i++) {
             int x = tetromino.getX(i);
             int y = tetromino.getY(i);
             grid[y][x] = 0;
         }
-        if (direction == 0) {
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i);
-                int y = tetromino.getY(i);
-                grid[y + 1][x] = tetromino.getType();
-            }
-        } else {
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i);
-                int y = tetromino.getY(i);
-                grid[y][x + direction] = tetromino.getType();
-            }
-        }
-
     }
 
-    private boolean canTetrominoMove(int direction) {
-    // direction = -1 -> moveTetrominoLeft
-    // direction = 1 -> moveTetrominoRight
-    // direction = 0 -> down
-        if (direction < -1 && direction > 1) {
-            System.out.println("Something is wrong in GridLogic.java with the variable direction (out of bounds)");
-            return false;
-        }
-
-        if (direction == 0) {
-            // This checks if the tetromino can moveTetromino down
-            // First, check if the tetromino wants to go out of bounds
-            for (int i = 0; i < 4; i++) {
-                int y = tetromino.getY(i) + 1;
-                if (y > 19) {
-                    tetrominoControllable = false;
-                    roundOver = true;
-                    return false;
-                }
-            }
-            // Second, check if the tetromino wants to occupy a square already occupied
-            // If the tetromino wants to occupy squares that are not empty or occupied by itself return false
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i);
-                int y = tetromino.getY(i) + 1;
-                if (!canSquareAdvance(x, y, i)) {
-                    tetrominoControllable = false;
-                    roundOver = true;
-                    return false;
-                }
-            }
-
-        } else {
-            // This checks if the tetromino can moveTetromino left (-1), or right (1)
-            // First, check if the tetromino wants to go out of bounds
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i) + direction;
-                if (x < 0 || x > 9)
-                    return false;
-            }
-            // Second, check if the tetromino wants to occupy a square already occupied
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i) + direction;
-                int y = tetromino.getY(i);
-                if (!canSquareAdvance(x, y, i)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    void rotateTetrominoRight() {
-        if (tetromino.getType() != Tetromino.SQUARE) {
-            // Take the tetromino out of the grid for updating position
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i);
-                int y = tetromino.getY(i);
-                grid[y][x] = 0;
-            }
-            tetromino.rotateRight();
-            // Place it back in the grid after updating position
-            for (int i = 0; i < 4; i++) {
-                int x = tetromino.getX(i);
-                int y = tetromino.getY(i);
-                grid[y][x] = tetromino.getType();
-            }
-        }
-    }
-    
-    private boolean canTetrominoSpawn() {
+    private void placeTetrominoInGrid() {
         for (int i = 0; i < 4; i++) {
+            int x = tetromino.getX(i);
+            int y = tetromino.getY(i);
+            grid[y][x] = tetromino.getType();
+        }
+    }
+
+    private boolean isTetrominoValid() {
+        // Returns false if it's outside the grid or in collision with other tetromino squares, else returns true
+        for (int i = 0; i < Tetromino.MAX_NUMBER_OF_SQUARES; i++) {
             int y = tetromino.getY(i);
             int x = tetromino.getX(i);
-            if (grid[y][x] != 0)
+            if (y < 0 || y > 19 || x < 0 || x > 9)
                 return false;
-        }
-        return true;
-    }
-
-    private boolean canSquareAdvance(int x, int y, int i) {
-        if (grid[y][x] != 0) {
-            boolean squareCanAdvance = false;
-            for (int j = 0; j < 4; j++) {
-                if (i != j) {
-                    int x2 = tetromino.getX(j);
-                    int y2 = tetromino.getY(j);
-                    if (y == y2 && x == x2) {
-                        squareCanAdvance = true;
-                    }
-                }
-            }
-            if (!squareCanAdvance) {
+            if (grid[y][x] != 0) {
                 return false;
             }
         }
