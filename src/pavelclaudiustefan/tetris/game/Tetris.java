@@ -48,6 +48,8 @@ public class Tetris extends JFrame implements KeyListener{
             }
             // TODO - Proper game over screen
             System.out.println("Game over!");
+            GameOverFrame gof = new GameOverFrame(logic);
+            gof.showFrame();
             removeKeyListener(this);
             logic.setTopScore();
         }).start();

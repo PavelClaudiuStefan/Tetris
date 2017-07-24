@@ -162,7 +162,7 @@ class GridLogic {
         }
     }
 
-    void moveTetrominoDown() {
+    synchronized void moveTetrominoDown() {
         if (tetrominoControllable) {
             removeTetrominoFromGrid();
             tetromino.savePosition();
@@ -185,7 +185,7 @@ class GridLogic {
     }
 
     void rotateTetrominoRight() {
-        if (tetromino.getType() != Tetromino.SQUARE) {
+        if (tetromino.getType() != Tetromino.SQUARE && tetrominoControllable) {
             removeTetrominoFromGrid();
             tetromino.savePosition();
             tetromino.rotateRight();

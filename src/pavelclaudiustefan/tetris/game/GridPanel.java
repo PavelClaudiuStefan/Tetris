@@ -22,18 +22,19 @@ class GridPanel extends JPanel{
         if (height == 20 && width == 10) {
             // Default tetris grid size
             if (borderSprite != null) {
-                drawTopBorder(0);
-                drawBottomBorder(0);
-                drawLeftBorder(0);
-                drawRightBorder(0);
+                drawTopBorder();
+                drawBottomBorder();
+                drawLeftBorder();
+                drawRightBorder();
                 drawGridArea();
             }
         } else {
-            drawTopBorder(60);
+            /*drawTopBorder(60);
             drawBottomBorder(60);
             drawLeftBorder(60);
-            drawRightBorder(60);
-            drawPreviewGridArea(80);
+            drawRightBorder(60);*/
+            drawPreviewArea();
+            drawPreviewGridArea();
         }
     }
 
@@ -42,9 +43,9 @@ class GridPanel extends JPanel{
         borderSprite = tetrominoSprites.get(8);
     }
 
-    private void drawTopBorder(int xOffset) {
+    private void drawTopBorder() {
         for (int i = 0;  i < width + 2; i++) {
-            int x = xOffset + 20 * i;
+            int x = 20 * i;
             int y = 0;
             JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
             borderLabel.setBounds(x, y, 20, 20);
@@ -52,9 +53,9 @@ class GridPanel extends JPanel{
         }
     }
 
-    private void drawBottomBorder(int xOffset) {
+    private void drawBottomBorder() {
         for (int i = 0;  i < width + 2; i++) {
-            int x = xOffset + 20 * i;
+            int x =20 * i;
             int y = height * 20 + 20;
             JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
             borderLabel.setBounds(x, y, 20, 20);
@@ -62,9 +63,9 @@ class GridPanel extends JPanel{
         }
     }
 
-    private void drawLeftBorder(int xOffset) {
+    private void drawLeftBorder() {
         for (int i = 1;  i <= height; i++) {
-            int x = xOffset;
+            int x = 0;
             int y = i * 20;
             JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
             borderLabel.setBounds(x, y, 20, 20);
@@ -72,9 +73,9 @@ class GridPanel extends JPanel{
         }
     }
 
-    private void drawRightBorder(int xOffset) {
+    private void drawRightBorder() {
         for (int i = 1;  i <= height; i++) {
-            int x = xOffset + width * 20 + 20;
+            int x = width * 20 + 20;
             int y = 20 * i;
             JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
             borderLabel.setBounds(x, y, 20, 20);
@@ -94,10 +95,24 @@ class GridPanel extends JPanel{
         }
     }
 
-    private void drawPreviewGridArea(int xOffset) {
+    private void drawPreviewArea() {
+        for (int i = 0;  i < 12; i++) {
+            for (int j = 0; j < 11; j++) {
+                    int x = 20 * i;
+                    int y = 20 * j;
+                if (x <= 60 || x > 140 || y < 20 || y > 160) {
+                    JLabel borderLabel = new JLabel(new ImageIcon(borderSprite));
+                    borderLabel.setBounds(x, y, 20, 20);
+                    add(borderLabel);
+                }
+            }
+        }
+    }
+
+    private void drawPreviewGridArea() {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                int x = xOffset + j * 20;
+                int x = 60 + j * 20;
                 int y = 20 + i * 20;
                 JLabel borderLabel = new JLabel(new ImageIcon(tetrominoSprites.get(logic.getPreviewSquareType(i, j))));
                 borderLabel.setBounds(x, y, 20, 20);
